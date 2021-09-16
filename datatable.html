@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+  <title>Hello, world!</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+
+
+  <!-- datatable -->
+  <div>
+    <table class="table container" id="tablaAlumnos">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>nombre</th>
+        </tr>
+      </thead>
+
+      <tbody class="" id="idTbody">
+
+      </tbody>
+    </table>
+
+  </div>
+
+
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+    crossorigin="anonymous"></script>
+
+  <!-- SWAL -->
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>
+
+
+<script>
+  $(document).ready(function () {
+    $.ajax({
+      url: "https://localhost:5001/Alumnos/ObtenerAlumnos",
+      type: "GET",
+      success: function (result) {
+        if (result.ok) {
+
+
+          cargarLista(result.return);
+
+          console.log("hola pa")
+
+        }
+        else {
+          Swal.fire("no se pudo crear tabla")
+        }
+
+      },
+      error: function (error) {
+        console.log("hubo un error");
+      }
+    })
+
+
+  });
+
+
+  function cargarLista(datos) {
+
+    for (var i = 0; i < datos.length; i++) {
+      var html =
+        "<tr taskId='" + datos[i].alumnoId + "'>";
+      html += '<td>' + datos[i].alumnoId + '</td>';
+      html += '<td>' + datos[i].nombre + '</td>';
+      html += '<td>' + '<button type="button" class="btn btn-danger task-delete" id="btnEliminar"> delete </button>' + '</td>';
+      html += '</tr>'
+      $("#idTbody").append(html);
+    }
+
+  }
+
+  $(document).on('click', '.task-delete', function () {
+    const element = $(this)[0].parentElement.parentElement;
+    const id = $(element).attr('taskId');
+    if (id === "") {
+      Swal.fire('seleccione alumno a eliminar');
+    } else {
+      deleteAlumno(parseInt(id));
+    }
+
+    console.log(id);
+  })
+
+
+
+  function deleteAlumno(idAlumno) {
+    $.ajax({
+      url: "https://localhost:5001/Alumnos/DeleteAlumno/" + idAlumno,
+      type: "DELETE",
+      dataType: 'JSON',
+      contentType: 'application/json',
+      data: JSON.stringify(idAlumno),
+      success: function (result) {
+        Swal.fire("alumno eliminado con exito");
+        setTimeout(function () { location.reload(); }, 1000);
+
+      },
+      error: function (error) {
+        Swal.fire("problemas en el server")
+        
+      }
+
+
+    })
+
+  }
+
+
+
+
+
+
+</script>
